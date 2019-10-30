@@ -9,7 +9,9 @@
         <setting name="aggressiveLazyLoading" value="false"/>
     </settings>
     <plugins>
-        <plugin interceptor="com.github.pagehelper.PageInterceptor"/>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <property name="reasonable" value="true"/>
+        </plugin>
     </plugins>
     <databaseIdProvider type="DB_VENDOR">
         <property name="MySQL" value="mysql"/>

@@ -13,6 +13,17 @@ public class Employee {
 
     private Department department;
 
+    public Employee() {
+    }
+
+    public Employee(Integer id, String name, String gender, String email, Integer deptId) {
+        this.id = id;
+        this.name = name;
+        this.gender = gender;
+        this.email = email;
+        this.deptId = deptId;
+    }
+
     public Integer getId() {
         return id;
     }

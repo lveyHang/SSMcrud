@@ -26,6 +26,12 @@
         <property name="mapperLocations" value="classpath:mapper/*.xml"/>
     </bean>
 
+    <!-- 配置一个可以执行批量的SqlSession -->
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"/>
+        <constructor-arg name="executorType" value="BATCH"/>
+    </bean>
+
     <!-- 配置 MyBatis 接口扫描器 -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.lvey.crud.dao"/>

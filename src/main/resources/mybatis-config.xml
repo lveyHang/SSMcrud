@@ -8,7 +8,9 @@
         <setting name="lazyLoadingEnabled" value="true"/>
         <setting name="aggressiveLazyLoading" value="false"/>
     </settings>
-
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageInterceptor"/>
+    </plugins>
     <databaseIdProvider type="DB_VENDOR">
         <property name="MySQL" value="mysql"/>
         <property name="Oracle" value="oracle"/>

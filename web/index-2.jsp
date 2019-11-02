@@ -220,10 +220,21 @@
 
             var navEle = $("<nav></nav>").append(ul).appendTo("#page_nav_area");
         }
+
+        // 清空表单样式
+        function reset_form(element) {
+            $(element)[0].reset();
+            $(element).find("*").removeClass("has-success has-error");
+            $(element).find(".help-block").text("");
+        }
         
         /* 点击新建按钮弹出模态框 */
         $("#emp_add_modal_btn").click(function () {
+            // 清空表单数据
+            reset_form("#empAddModal form");
             // 发送 Ajax 请求，查询部门信息
+            // 清除 select 标签所有的 option 标签
+            $("#emp_add_select").empty().append($("<option></option>").append("--请选择--"));
             getDepts();
             // 显示模态框
             $("#empAddModal").modal({
@@ -248,7 +259,13 @@
         // 保存新增员工信息
         $("#emp_save_btn").click(function () {
             // 校验输入的信息
-            if (!validate_add_form()) {
+            if (!validate_add_form("#empName_add_input")) {
+                return false;
+            }
+            if (!validate_add_form("#empEmail_add_input")) {
+                return false;
+            }
+            if ($(this).attr("ajax_validate") === "error") {
                 return false;
             }
             // 提交要保存的信息
@@ -257,15 +274,39 @@
                 type:"POST",
                 data:$("#empAddModal form").serialize(),
                 success:function (result) {
-                    $('#empAddModal').modal('hide');
-                    toPage(totalRecord);
+                    if (result.code === 100) {
+                        // 后端校验成功
+                        $('#empAddModal').modal('hide');
+                        toPage(totalRecord);
+                    } else {
+                        // 后端校验失败
+                        //console.log(result);
+                        if (undefined !== result.extend.errorFields.name) {
+                            show_validate_msg("#empName_add_input", "error", result.extend.errorFields.name);
+                        }
+                        if (undefined !== result.extend.errorFields.email) {
+                            show_validate_msg("#empEmail_add_input", "error", result.extend.errorFields.email);
+                        }
+                    }
                 }
             });
         });
 
+        // 校验表单数据是否为空
+        function validate_add_form(element) {
+            var elementVal = $(element).val();
+            //alert("elementVal : " + elementVal);
+            if (elementVal === "") {
+                show_validate_msg(element, "error", "必填项");
+                return false;
+            } else {
+                return true;
+            }
+        }
+
         // 校验表单数据
-        function validate_add_form() {
-            // 校验用户名
+        $("#empName_add_input").change(function () {
+            // 校验用户名是否合法
             var empName = $("#empName_add_input").val();
             var regName = /(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5})/;
             if (!regName.test(empName)) {
@@ -275,7 +316,24 @@
             } else {
                 show_validate_msg("#empName_add_input", "success", "");
             }
+            // 校验用户名是否重复
+            $.ajax({
+                url:"${pageContext.request.contextPath}/checkEmp?time=" + new Date().getTime(),
+                data:"name=" + empName,
+                type:"POST",
+                success:function (result) {
+                    if (result.code === 100) {
+                        show_validate_msg("#empName_add_input", "success", "用户名可用");
+                        $("#emp_save_btn").attr("ajax_validate", "success");
+                    } else if (result.code === 200) {
+                        show_validate_msg("#empName_add_input", "error", "用户名不可用");
+                        $("#emp_save_btn").attr("ajax_validate", "error");
+                    }
+                }
+            });
+        });
 
+        $("#empEmail_add_input").change(function () {
             // 校验邮箱
             var empEmail = $("#empEmail_add_input").val();
             var regEmail = /^([a-z0-9_.-]+)@([\da-z.-]+)\.([a-z.]{2,6})$/;
@@ -286,7 +344,7 @@
             } else {
                 show_validate_msg("#empEmail_add_input", "success", "");
             }
-        }
+        });
 
         // 显示校验提示信息
         function show_validate_msg(element, status, msg) {

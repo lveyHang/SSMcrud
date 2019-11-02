@@ -8,12 +8,18 @@ import com.lvey.crud.vo.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 处理员工CRUD请求
@@ -63,8 +69,35 @@ public class EmployeeController {
      */
     @RequestMapping(value = "emps", method = RequestMethod.POST)
     @ResponseBody
-    public Message saveEmp(Employee employee) {
-        employeeService.saveEmp(employee);
-        return Message.success();
+    public Message saveEmp(@Valid Employee employee, BindingResult result) {
+        //System.out.println("Employee" + employee);
+        if (result.hasErrors()) {
+            List<FieldError> errors = result.getFieldErrors();
+            Map<String, Object> map = new HashMap<>();
+            for (FieldError error : errors) {
+                //System.out.println("错误字段：" + error.getField());
+                //System.out.println("错误信息：" + error.getDefaultMessage());
+                map.put(error.getField(), error.getDefaultMessage());
+            }
+            return Message.error().add("errorFields", map);
+        } else {
+            employeeService.saveEmp(employee);
+            return Message.success();
+        }
+    }
+
+    /**
+     * 按姓名查询员工信息
+     */
+    @RequestMapping("checkEmp")
+    @ResponseBody
+    public Message checkEmp(@RequestParam("name") String empName) {
+        //System.out.println(empName);
+        boolean exist = employeeService.checkEmp(empName);
+        if (exist) {
+            return Message.success();
+        } else {
+            return Message.error();
+        }
     }
 }

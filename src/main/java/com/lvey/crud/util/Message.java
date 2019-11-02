@@ -39,7 +39,7 @@ public class Message {
         return result;
     }
 
-    public static Message fail() {
+    public static Message error() {
         Message result = new Message();
         result.setCode(200);
         result.setMsg("处理失败！");

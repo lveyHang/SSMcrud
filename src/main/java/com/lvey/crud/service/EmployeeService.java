@@ -2,6 +2,7 @@ package com.lvey.crud.service;
 
 import com.lvey.crud.dao.EmployeeMapper;
 import com.lvey.crud.vo.Employee;
+import com.lvey.crud.vo.EmployeeExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +26,17 @@ public class EmployeeService {
      */
     public void saveEmp(Employee employee) {
         employeeMapper.insertSelective(employee);
+    }
+
+    /**
+     * 检查员工名是否可用
+     * @return true: 员工名可用
+     */
+    public boolean checkEmp(String empName) {
+        EmployeeExample example = new EmployeeExample();
+        EmployeeExample.Criteria criteria = example.createCriteria();
+        criteria.andNameEqualTo(empName);
+        long count = employeeMapper.countByExample(example);
+        return count == 0;
     }
 }

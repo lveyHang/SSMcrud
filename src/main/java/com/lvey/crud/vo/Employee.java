@@ -1,12 +1,19 @@
 package com.lvey.crud.vo;
 
+import org.hibernate.validator.constraints.Email;
+
+import javax.validation.constraints.Pattern;
+
 public class Employee {
     private Integer id;
 
+    @Pattern(regexp = "(^[a-zA-Z0-9_-]{6,16}$)|(^[\\u2E80-\\u9FFF]{2,5})",
+            message = "用户名必须是2-5位中文字符或者由6-16位英文和数字组成")
     private String name;
 
     private String gender;
 
+    @Email
     private String email;
 
     private Integer deptId;
@@ -70,5 +77,17 @@ public class Employee {
 
     public void setDepartment(Department department) {
         this.department = department;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", gender='" + gender + '\'' +
+                ", email='" + email + '\'' +
+                ", deptId=" + deptId +
+                ", department=" + department +
+                '}';
     }
 }

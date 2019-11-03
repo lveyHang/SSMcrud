@@ -10,11 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -99,5 +95,27 @@ public class EmployeeController {
         } else {
             return Message.error();
         }
+    }
+
+    /**
+     * 按 id 查询员工信息
+     */
+    @RequestMapping(value = "emp/{id}", method = RequestMethod.GET)
+    @ResponseBody
+    public Message getEmp(@PathVariable Integer id) {
+        Employee employee = employeeService.getEmp(id);
+        //System.out.println(employee);
+        return Message.success().add("employee", employee);
+    }
+
+    /**
+     * 保存修改后的员工信息
+     */
+    @RequestMapping(value = "emp/{id}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Message updateEmp(Employee employee) {
+        System.out.println(employee);
+        employeeService.updateEmp(employee);
+        return Message.success();
     }
 }

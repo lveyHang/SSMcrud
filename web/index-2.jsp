@@ -139,6 +139,7 @@
                 <table class="table table-hover" id="emps_table">
                     <thead>
                         <tr>
+                            <th></label><input type="checkbox" id="check_all"></th>
                             <th>#</th>
                             <th>姓名</th>
                             <th>性别</th>
@@ -193,6 +194,7 @@
             $("#emps_table tbody").empty();
             var emps = result.extend.pageInfo.list;
             $.each(emps, function (index, item) {
+                var checkBoxTd = $("<td></td>").append($("<input type='checkbox' class='check_item'>"));
                 var idTd = $("<td></td>").append(item.id);
                 var nameTd = $("<td></td>").append(item.name);
                 var genderTd = $("<td></td>").append(item.gender);
@@ -207,7 +209,8 @@
                     .append("删除");
                 delBtn.attr("delete-id", item.id);
                 var btnTd = $("<td></td>").append(editBtn).append(" ").append(delBtn);
-                $("<tr></tr>").append(idTd)
+                $("<tr></tr>").append(checkBoxTd)
+                    .append(idTd)
                     .append(nameTd)
                     .append(genderTd)
                     .append(emailTd)
@@ -428,6 +431,21 @@
             });
         });
 
+        // 给删除按钮绑定点击事件
+        $(document).on("click", ".delete_btn", function () {
+            var empId = $(this).attr("delete-id");
+            var empName = $(this).parents("tr").find("td:eq(2)").text();
+            if (confirm("确认删除 " + empName + " 吗？")) {
+                $.ajax({
+                    url:"${pageContext.request.contextPath}/emp/" + empId,
+                    type:"DELETE",
+                    success:function (result) {
+                        toPage(currentPage);
+                    }
+                });
+            }
+        });
+
         //查询员工信息
         function getEmp(id) {
             $.ajax({
@@ -468,6 +486,39 @@
                     toPage(currentPage);
                 }
             });
+        });
+
+        // 多选按钮全选或全不选
+        $("#check_all").click(function () {
+            $(".check_item").prop("checked", $(this).prop("checked"));
+        });
+
+        // 当其他多选按钮全部选中，全选按钮也选中
+        $(document).on("click", ".check_item", function () {
+            var flag = $(".check_item:checked").length === $(".check_item").length;
+            $("#check_all").prop("checked", flag);
+        });
+
+        $("#emp_del_modal_btn").click(function () {
+            var empIds = "";
+            var empNames = "";
+            $.each($(".check_item:checked"), function () {
+                empIds += $(this).parents("tr").find("td:eq(1)").text() + "-";
+                empNames += $(this).parents("tr").find("td:eq(2)").text() + ",";
+            });
+            empIds = empIds.substring(0, empIds.length - 1);
+            empNames = empNames.substring(0, empNames.length - 1);
+            alert(empIds);
+            alert(empNames);
+            if (confirm("确定要删除 " + empNames + " 吗？")) {
+                $.ajax({
+                    url:"${pageContext.request.contextPath}/emp/" + empIds,
+                    type:"DELETE",
+                    success:function (result) {
+                        toPage(currentPage);
+                    }
+                });
+            }
         });
     </script>
 </body>

@@ -13,7 +13,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>4.0.0.RELEASE</version>
+            <version>5.2.20.RELEASE</version>
         </dependency>
         <!-- 返回 json 字符串的支持 -->
         <dependency>
